@@ -6,8 +6,8 @@ packages:
 catalogMode: prefer
 
 catalog:
-  "@types/node": ^24
-  typescript: ^5
+  "@types/node": ^25
+  typescript: ^7.0.2
   valibot: ^1.4.2
   vite: npm:@voidzero-dev/vite-plus-core@0.2.4
   vite-plus: 0.2.4
@@ -18,3 +18,6 @@ peerDependencyRules:
     - vite
   allowedVersions:
     vite: "*"
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
