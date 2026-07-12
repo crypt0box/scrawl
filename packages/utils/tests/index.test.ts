@@ -1,6 +1,11 @@
 import { expect, test } from "vite-plus/test";
-import { fn } from "../src/index.ts";
+import { normalizeTags, tagsMatch } from "../src/index.ts";
 
-test("fn", () => {
-  expect(fn()).toBe("Hello, tsdown!");
+test("normalizeTags trims and dedupes case-insensitively", () => {
+  expect(normalizeTags([" foo ", "bar", "Foo", "bar"])).toEqual(["foo", "bar"]);
+});
+
+test("tagsMatch compares case-insensitively", () => {
+  expect(tagsMatch("Foo", "foo")).toBe(true);
+  expect(tagsMatch("foo", "bar")).toBe(false);
 });
