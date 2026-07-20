@@ -94,7 +94,6 @@ export function createMemo(db: Db, input: MemoCreate): Memo {
   });
 }
 
-// NOTE: Apparent physical deletion. The row is internally kept as a tombstone for synchronization purposes.
 export function patchMemoByNumber(db: Db, number: number, patch: MemoPatch): Memo | null {
   return db.transaction((tx) => {
     const row = tx.select().from(memos).where(eq(memos.number, number)).get();
@@ -109,6 +108,26 @@ export function patchMemoByNumber(db: Db, number: number, patch: MemoPatch): Mem
     };
     tx.update(memos).set(updated).where(eq(memos.uuid, row.uuid)).run();
     return toMemo(updated);
+  });
+}
+
+// NOTE: Apparent physical deletion. The row is internally kept as a tombstone for synchronization purposes.
+export function deleteMemoByNumber(db: Db, number: number): boolean {
+  return db.transaction((tx) => {
+    const row = tx.select().from(memos).where(eq(memos.number, number)).get();
+    if (row === undefined || row.deleted) return false;
+    tx.update(memos)
+      .set({
+        title: "",
+        tags: [],
+        body: "",
+        deleted: true,
+        updatedAt: Date.now(),
+        serverSeq: nextSeq(tx),
+      })
+      .where(eq(memos.uuid, row.uuid))
+      .run();
+    return true;
   });
 }
 
